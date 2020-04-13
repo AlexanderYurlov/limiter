@@ -1,0 +1,5 @@
+limiter:
+  limit:
+    time-period-min: 1
+    max-call-quantity: 45
+    cron: 0 */5 * * * *
