@@ -20,13 +20,13 @@ public class LimiterConfig {
 
     private final LimiterProperties limiterProperties;
 
+    public LimiterConfig(LimiterProperties limiterProperties) {
+        this.limiterProperties = limiterProperties;
+    }
+
     @Scope(value = WebApplicationContext.SCOPE_SESSION, proxyMode = ScopedProxyMode.TARGET_CLASS)
     @Bean
     public SessionData requestSessionData() {
         return new SessionData();
-    }
-
-    public LimiterConfig(LimiterProperties limiterProperties) {
-        this.limiterProperties = limiterProperties;
     }
 }
