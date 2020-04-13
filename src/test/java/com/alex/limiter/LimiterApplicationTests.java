@@ -1,5 +1,6 @@
 package com.alex.limiter;
 
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -20,8 +21,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-
-import javafx.util.Pair;
 
 import com.alex.limiter.config.LimiterProperties;
 
@@ -52,7 +51,7 @@ class LimiterApplicationTests {
     @Test
     void multithreadingTest() throws Exception {
 
-        List<Future<Pair<String, Integer>>> futures = new ArrayList<>(allRequestCount);
+        List<Future<SimpleEntry<String, Integer>>> futures = new ArrayList<>(allRequestCount);
         for (int i = 0; i < differentIp; i++) {
             for (int j = 0; j < requestCountPerIp; j++) {
                 int finalI = i;
@@ -83,9 +82,9 @@ class LimiterApplicationTests {
         }
     }
 
-    private Map<String, List<Integer>> getResult(List<Future<Pair<String, Integer>>> futures) throws Exception {
+    private Map<String, List<Integer>> getResult(List<Future<SimpleEntry<String, Integer>>> futures) throws Exception {
         Map<String, List<Integer>> result = new HashMap<>();
-        for (Future<Pair<String, Integer>> future : futures) {
+        for (Future<SimpleEntry<String, Integer>> future : futures) {
             if (future.isDone()) {
 
                 var key = future.get().getKey();
@@ -103,7 +102,7 @@ class LimiterApplicationTests {
         return result;
     }
 
-    private Pair<String, Integer> requestPerform(String ip) throws Exception {
+    private SimpleEntry<String, Integer> requestPerform(String ip) throws Exception {
         MvcResult result = mockMvc.perform(
                 MockMvcRequestBuilders
                         .get("/")
@@ -116,7 +115,7 @@ class LimiterApplicationTests {
                         .accept(MediaType.APPLICATION_JSON))
                 .andReturn();
 
-        return new Pair<>(ip, result.getResponse().getStatus());
+        return new SimpleEntry<>(ip, result.getResponse().getStatus());
     }
 
 }
