@@ -24,7 +24,6 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import com.alex.limiter.config.LimiterProperties;
 
-import static java.lang.Thread.sleep;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest(properties = "spring.profiles.active=test", webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -33,7 +32,7 @@ class LimiterApplicationTests {
 
     private int differentIp = 10;
 
-    private int requestCountPerIp = 50;
+    private int requestCountPerIp = 500;
 
     private int allRequestCount = differentIp * requestCountPerIp;
 
@@ -51,16 +50,14 @@ class LimiterApplicationTests {
     @Test
     void multithreadingTest() throws Exception {
 
-        List<Future<SimpleEntry<String, Integer>>> futures = new ArrayList<>(allRequestCount);
+        List<Callable<SimpleEntry<String, Integer>>> tasks = new ArrayList<>();
         for (int i = 0; i < differentIp; i++) {
             for (int j = 0; j < requestCountPerIp; j++) {
                 int finalI = i;
-                Future future = executor.submit((Callable) () -> requestPerform("192.168.0." + finalI));
-                futures.add(future);
+                tasks.add((Callable) () -> requestPerform("192.168.0." + finalI));
             }
         }
-        sleep(5000);
-        Map<String, List<Integer>> res = getResult(futures);
+        Map<String, List<Integer>> res = getResult(tasks);
         checkResult(res);
     }
 
@@ -82,21 +79,17 @@ class LimiterApplicationTests {
         }
     }
 
-    private Map<String, List<Integer>> getResult(List<Future<SimpleEntry<String, Integer>>> futures) throws Exception {
+    private Map<String, List<Integer>> getResult(List<Callable<SimpleEntry<String, Integer>>> tasks) throws Exception {
         Map<String, List<Integer>> result = new HashMap<>();
+        List<Future<SimpleEntry<String, Integer>>> futures = executor.invokeAll(tasks);
         for (Future<SimpleEntry<String, Integer>> future : futures) {
-            if (future.isDone()) {
+            var key = future.get().getKey();
+            var value = future.get().getValue();
 
-                var key = future.get().getKey();
-                var value = future.get().getValue();
-
-                if (result.containsKey(key)) {
-                    result.get(key).add(value);
-                } else {
-                    result.put(key, new ArrayList<>(Collections.singletonList(value)));
-                }
+            if (result.containsKey(key)) {
+                result.get(key).add(value);
             } else {
-                throw new Exception("Too long. Check it");
+                result.put(key, new ArrayList<>(Collections.singletonList(value)));
             }
         }
         return result;

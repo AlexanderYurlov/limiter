@@ -24,10 +24,6 @@ public class LimiterProperties {
     @Positive
     private Integer maxCallQuantity;
 
-    @NotEmpty
-    private String cron = "0 */15 * * * *";
-
-
     private Long timePeriodMls;
 
     @PostConstruct
