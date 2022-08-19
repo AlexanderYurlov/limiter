@@ -1,5 +1,7 @@
 package com.alex.limiter.controller;
 
+import java.util.Collections;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.http.HttpStatus;
@@ -30,7 +32,7 @@ public class LimiterController {
         if (!LimitStorageService.isAccessible(ip, currentTimeMillis(), limiterProperties)) {
             return ResponseEntity.status(HttpStatus.BAD_GATEWAY).build();
         }
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(Collections.EMPTY_MAP);
     }
 
 }
