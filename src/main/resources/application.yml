@@ -1,3 +1,7 @@
 server:
   port: 8080
 
+limiter:
+  limit:
+    time-period-min: 1
+    max-call-quantity: 5

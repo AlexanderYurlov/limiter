@@ -1,7 +1,6 @@
 package com.alex.limiter.config;
 
 import javax.annotation.PostConstruct;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Positive;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
